@@ -15,28 +15,24 @@
 //
 
 #import "TCProtocolFormatter.h"
+#import "KSURLQueryUtilities.h"
 
 @implementation TCProtocolFormatter
 
 + (NSURL *)formatPostion:(TCPosition *)position address:(NSString *)address port:(long)port {
-    
-    NSURLComponents *components = [[NSURLComponents alloc] init];
-    
-    components.scheme = @"http";
-    components.percentEncodedHost = [NSString stringWithFormat:@"%@:%ld", address, port];
-    
-    NSMutableArray *queryItems = [[NSMutableArray alloc] init];
-    [queryItems addObject:[NSURLQueryItem queryItemWithName:@"id" value:position.deviceId]];
-    [queryItems addObject:[NSURLQueryItem queryItemWithName:@"timestamp" value:[NSString stringWithFormat:@"%ld", (long) [position.time timeIntervalSince1970]]]];
-    [queryItems addObject:[NSURLQueryItem queryItemWithName:@"lat" value:[NSString stringWithFormat:@"%g", position.latitude]]];
-    [queryItems addObject:[NSURLQueryItem queryItemWithName:@"lon" value:[NSString stringWithFormat:@"%g", position.longitude]]];
-    [queryItems addObject:[NSURLQueryItem queryItemWithName:@"speed" value:[NSString stringWithFormat:@"%g", position.speed]]];
-    [queryItems addObject:[NSURLQueryItem queryItemWithName:@"bearing" value:[NSString stringWithFormat:@"%g", position.course]]];
-    [queryItems addObject:[NSURLQueryItem queryItemWithName:@"altitude" value:[NSString stringWithFormat:@"%g", position.altitude]]];
-    [queryItems addObject:[NSURLQueryItem queryItemWithName:@"batt" value:[NSString stringWithFormat:@"%g", position.battery]]];
-    components.queryItems = queryItems;
-    
-    return components.URL;
+    return [NSURL ks_URLWithScheme:@"http"
+                              host:[NSString stringWithFormat:@"%@:%ld", address, port]
+                              path:@"/"
+                   queryParameters:[NSDictionary dictionaryWithObjectsAndKeys:
+                                    position.deviceId, @"id",
+                                    [NSString stringWithFormat:@"%ld", (long) [position.time timeIntervalSince1970]], @"timestamp",
+                                    [NSString stringWithFormat:@"%g", position.latitude], @"lat",
+                                    [NSString stringWithFormat:@"%g", position.longitude], @"lon",
+                                    [NSString stringWithFormat:@"%g", position.speed], @"speed",
+                                    [NSString stringWithFormat:@"%g", position.course], @"bearing",
+                                    [NSString stringWithFormat:@"%g", position.altitude], @"altitude",
+                                    [NSString stringWithFormat:@"%g", position.battery], @"batt",
+                                    nil]];
 }
 
 @end

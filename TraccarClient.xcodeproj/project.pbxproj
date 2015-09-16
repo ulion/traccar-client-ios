@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		8238999A1BA787FD00681873 /* KSURLQueryUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 823899991BA787FD00681873 /* KSURLQueryUtilities.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		CBB504E01B8C1FC5001C1F8B /* TCDatabaseHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = CBB504DF1B8C1FC5001C1F8B /* TCDatabaseHelper.m */; };
 		CBCE82EF1B8D253600A7318B /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CBCE82EE1B8D253600A7318B /* CoreData.framework */; };
 		CBCE82F21B8D265800A7318B /* TraccarClient.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = CBCE82F01B8D265800A7318B /* TraccarClient.xcdatamodeld */; };
@@ -63,6 +64,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		823899981BA787FD00681873 /* KSURLQueryUtilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = KSURLQueryUtilities.h; path = KSFileUtilities/KSURLQueryUtilities.h; sourceTree = "<group>"; };
+		823899991BA787FD00681873 /* KSURLQueryUtilities.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = KSURLQueryUtilities.m; path = KSFileUtilities/KSURLQueryUtilities.m; sourceTree = "<group>"; };
 		CBB504DE1B8C1FC5001C1F8B /* TCDatabaseHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TCDatabaseHelper.h; sourceTree = "<group>"; };
 		CBB504DF1B8C1FC5001C1F8B /* TCDatabaseHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TCDatabaseHelper.m; sourceTree = "<group>"; };
 		CBCE82EE1B8D253600A7318B /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
@@ -188,9 +191,19 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		8238999B1BA7881400681873 /* KSFileUtilities */ = {
+			isa = PBXGroup;
+			children = (
+				823899981BA787FD00681873 /* KSURLQueryUtilities.h */,
+				823899991BA787FD00681873 /* KSURLQueryUtilities.m */,
+			);
+			name = KSFileUtilities;
+			sourceTree = "<group>";
+		};
 		CED4870F17DB1BF6007FCF57 = {
 			isa = PBXGroup;
 			children = (
+				8238999B1BA7881400681873 /* KSFileUtilities */,
 				CED4872117DB1BF6007FCF57 /* TraccarClient */,
 				CEE8A4581A72E91E00BD6DB3 /* InAppSettingsKit */,
 				CEE286CF1B80839700AE7E83 /* TraccarClientTests */,
@@ -480,6 +493,7 @@
 				CED4872817DB1BF6007FCF57 /* main.m in Sources */,
 				CEE8A4901A72E91E00BD6DB3 /* IASKSettingsStoreFile.m in Sources */,
 				CBDEEB881B8EB536006BC126 /* TCNetworkManager.m in Sources */,
+				8238999A1BA787FD00681873 /* KSURLQueryUtilities.m in Sources */,
 				CEE8A48C1A72E91E00BD6DB3 /* IASKMultipleValueSelection.m in Sources */,
 				CE4968251B80A1C200A4964A /* TCProtocolFormatter.m in Sources */,
 				CEE8A4971A72E91E00BD6DB3 /* IASKSwitch.m in Sources */,
@@ -642,7 +656,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "TraccarClient/TraccarClient-Prefix.pch";
 				INFOPLIST_FILE = "TraccarClient/TraccarClient-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				WRAPPER_EXTENSION = app;
@@ -659,7 +673,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "TraccarClient/TraccarClient-Prefix.pch";
 				INFOPLIST_FILE = "TraccarClient/TraccarClient-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				WRAPPER_EXTENSION = app;
