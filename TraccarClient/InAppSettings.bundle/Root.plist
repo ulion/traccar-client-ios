@@ -64,6 +64,30 @@
 			<key>Key</key>
 			<string>frequency_preference</string>
 		</dict>
+		<dict>
+			<key>KeyboardType</key>
+			<string>NumberPad</string>
+			<key>DefaultValue</key>
+			<string>50</string>
+			<key>Type</key>
+			<string>PSTextFieldSpecifier</string>
+			<key>Title</key>
+			<string>Min accuracy</string>
+			<key>Key</key>
+			<string>min_accuracy_preference</string>
+		</dict>
+		<dict>
+			<key>KeyboardType</key>
+			<string>NumberPad</string>
+			<key>DefaultValue</key>
+			<string>50</string>
+			<key>Type</key>
+			<string>PSTextFieldSpecifier</string>
+			<key>Title</key>
+			<string>Distance threshold</string>
+			<key>Key</key>
+			<string>distance_threshold_preference</string>
+		</dict>
 	</array>
 	<key>StringsTable</key>
 	<string>Root</string>

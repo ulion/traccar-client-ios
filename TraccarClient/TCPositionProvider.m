@@ -26,6 +26,8 @@
 
 @property (nonatomic, strong) NSString *deviceId;
 @property (nonatomic, assign) long period;
+@property (nonatomic, assign) long minAccuracy;
+@property (nonatomic, assign) long distanceThreshold;
 
 @end
 
@@ -43,6 +45,8 @@
         NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
         self.deviceId = [userDefaults stringForKey:@"device_id_preference"];
         self.period = [userDefaults integerForKey:@"frequency_preference"];
+        self.minAccuracy = [userDefaults integerForKey:@"min_accuracy_preference"];
+        self.distanceThreshold = [userDefaults integerForKey:@"distance_threshold_preference"];
     }
     return self;
 }
@@ -66,17 +70,22 @@
 - (void)locationManager:(CLLocationManager *)manager
      didUpdateLocations:(NSArray *)locations {
 
-    CLLocation *location = [locations lastObject];
-    
-    if (!self.lastLocation || [location.timestamp timeIntervalSinceDate:self.lastLocation.timestamp] >= self.period) {
-        
-        TCPosition *position = [[TCPosition alloc] initWithManagedObjectContext:[TCDatabaseHelper managedObjectContext]];
-        position.deviceId = self.deviceId;
-        position.location = location;
-        position.battery = self.batteryLevel;
-        
-        [self.delegate didUpdatePosition:position];
-        self.lastLocation = location;
+    for (CLLocation *location in locations) {
+        if (self.minAccuracy > 0 && (location.horizontalAccuracy < 0 || location.horizontalAccuracy > self.minAccuracy))
+            continue;
+        if (!self.lastLocation ||
+            [location.timestamp timeIntervalSinceDate:self.lastLocation.timestamp] >= self.period ||
+            (self.distanceThreshold > 0 && [location distanceFromLocation:self.lastLocation] >= self.distanceThreshold)
+            ) {
+            
+            TCPosition *position = [[TCPosition alloc] initWithManagedObjectContext:[TCDatabaseHelper managedObjectContext]];
+            position.deviceId = self.deviceId;
+            position.location = location;
+            position.battery = [self getBatteryLevel];
+            
+            [self.delegate didUpdatePosition:position];
+            self.lastLocation = location;
+        }
     }
 }
 

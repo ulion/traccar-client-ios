@@ -24,6 +24,7 @@
 @property (nonatomic, copy) NSDate *time;
 @property (nonatomic) double latitude;
 @property (nonatomic) double longitude;
+@property (nonatomic) double accuracy;
 @property (nonatomic) double altitude;
 @property (nonatomic) double speed;
 @property (nonatomic) double course;

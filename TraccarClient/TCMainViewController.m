@@ -44,6 +44,15 @@
                selector:@selector(defaultsChanged:)
                    name:NSUserDefaultsDidChangeNotification
                  object:nil];
+    if (!self.trackingController) {
+        NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+        BOOL status = [userDefaults boolForKey:@"service_status_preference"];
+        if (status) {
+            [TCStatusViewController addMessage:NSLocalizedString(@"Service created", @"")];
+            self.trackingController = [[TCTrackingController alloc] init];
+            [self.trackingController start];
+        }
+    }
 }
 
 -(void)viewWillDisappear:(BOOL)animated {

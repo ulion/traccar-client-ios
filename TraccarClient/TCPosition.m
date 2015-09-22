@@ -22,6 +22,7 @@
 @dynamic time;
 @dynamic latitude;
 @dynamic longitude;
+@dynamic accuracy;
 @dynamic altitude;
 @dynamic speed;
 @dynamic course;
@@ -36,6 +37,7 @@
     self.time = location.timestamp;
     self.latitude = location.coordinate.latitude;
     self.longitude = location.coordinate.longitude;
+    self.accuracy = location.horizontalAccuracy;
     self.altitude = location.altitude;
     if (location.speed >= 0) {
         self.speed = location.speed * 1.94384; // knots from m/s

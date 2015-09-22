@@ -28,6 +28,7 @@
                                     [NSString stringWithFormat:@"%ld", (long) [position.time timeIntervalSince1970]], @"timestamp",
                                     [NSString stringWithFormat:@"%g", position.latitude], @"lat",
                                     [NSString stringWithFormat:@"%g", position.longitude], @"lon",
+                                    [NSString stringWithFormat:@"%g", position.accuracy], @"accu",
                                     [NSString stringWithFormat:@"%g", position.speed], @"speed",
                                     [NSString stringWithFormat:@"%g", position.course], @"bearing",
                                     [NSString stringWithFormat:@"%g", position.altitude], @"altitude",
