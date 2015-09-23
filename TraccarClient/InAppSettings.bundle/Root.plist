@@ -88,6 +88,30 @@
 			<key>Key</key>
 			<string>distance_threshold_preference</string>
 		</dict>
+		<dict>
+			<key>KeyboardType</key>
+			<string>NumberPad</string>
+			<key>DefaultValue</key>
+			<string>10</string>
+			<key>Type</key>
+			<string>PSTextFieldSpecifier</string>
+			<key>Title</key>
+			<string>Speed delta threshold (kph)</string>
+			<key>Key</key>
+			<string>speed_delta_threshold_preference</string>
+		</dict>
+		<dict>
+			<key>KeyboardType</key>
+			<string>NumberPad</string>
+			<key>DefaultValue</key>
+			<string>30</string>
+			<key>Type</key>
+			<string>PSTextFieldSpecifier</string>
+			<key>Title</key>
+			<string>Course delta threshold</string>
+			<key>Key</key>
+			<string>course_delta_threshold_preference</string>
+		</dict>
 	</array>
 	<key>StringsTable</key>
 	<string>Root</string>

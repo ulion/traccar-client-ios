@@ -28,6 +28,8 @@
 @property (nonatomic, assign) long period;
 @property (nonatomic, assign) long minAccuracy;
 @property (nonatomic, assign) long distanceThreshold;
+@property (nonatomic, assign) long speedDeltaThreshold;
+@property (nonatomic, assign) long courseDeltaThreshold;
 
 @end
 
@@ -47,6 +49,8 @@
         self.period = [userDefaults integerForKey:@"frequency_preference"];
         self.minAccuracy = [userDefaults integerForKey:@"min_accuracy_preference"];
         self.distanceThreshold = [userDefaults integerForKey:@"distance_threshold_preference"];
+        self.speedDeltaThreshold = [userDefaults integerForKey:@"speed_delta_threshold_preference"]/3.6;
+        self.courseDeltaThreshold = [userDefaults integerForKey:@"course_delta_threshold_preference"];
     }
     return self;
 }
@@ -73,10 +77,12 @@
      didUpdateLocations:(NSArray *)locations {
 
     for (CLLocation *location in locations) {
-        if (location.horizontalAccuracy < 0 || (self.minAccuracy > 0 && location.horizontalAccuracy > self.minAccuracy))
+        if (location.horizontalAccuracy < 0 || (self.minAccuracy > 0 && location.horizontalAccuracy > self.minAccuracy) || (self.lastLocation && [location.timestamp isEqualToDate:self.lastLocation.timestamp]))
             continue;
         if (!self.lastLocation ||
             location.horizontalAccuracy < self.lastLocation.horizontalAccuracy ||
+            (location.speed >= 0 && (self.lastLocation.speed < 0 || location.speed - self.lastLocation.speed <= -self.speedDeltaThreshold || location.speed - self.lastLocation.speed >= self.speedDeltaThreshold)) ||
+            (location.course >= 0 && (self.lastLocation.course < 0 || location.course - self.lastLocation.course <= -self.courseDeltaThreshold || location.course - self.lastLocation.course >= self.courseDeltaThreshold)) ||
             [location.timestamp timeIntervalSinceDate:self.lastLocation.timestamp] >= self.period ||
             (self.distanceThreshold > 0 && [location distanceFromLocation:self.lastLocation] >= self.distanceThreshold)
             ) {
