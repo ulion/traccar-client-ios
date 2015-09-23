@@ -73,9 +73,10 @@
      didUpdateLocations:(NSArray *)locations {
 
     for (CLLocation *location in locations) {
-        if (self.minAccuracy > 0 && (location.horizontalAccuracy < 0 || location.horizontalAccuracy > self.minAccuracy))
+        if (location.horizontalAccuracy < 0 || (self.minAccuracy > 0 && location.horizontalAccuracy > self.minAccuracy))
             continue;
         if (!self.lastLocation ||
+            location.horizontalAccuracy < self.lastLocation.horizontalAccuracy ||
             [location.timestamp timeIntervalSinceDate:self.lastLocation.timestamp] >= self.period ||
             (self.distanceThreshold > 0 && [location distanceFromLocation:self.lastLocation] >= self.distanceThreshold)
             ) {
