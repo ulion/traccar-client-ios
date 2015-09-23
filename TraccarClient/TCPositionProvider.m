@@ -52,6 +52,8 @@
 }
 
 - (void)startUpdates {
+    UIDevice *device = [UIDevice currentDevice];
+    device.batteryMonitoringEnabled = YES;
     if ([self.locationManager respondsToSelector:@selector(requestAlwaysAuthorization)]) {
         [self.locationManager requestAlwaysAuthorization];
     }
