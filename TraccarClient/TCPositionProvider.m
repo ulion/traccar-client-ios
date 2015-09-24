@@ -81,8 +81,8 @@
             continue;
         if (!self.lastLocation ||
             location.horizontalAccuracy < self.lastLocation.horizontalAccuracy ||
-            (location.speed >= 0 && (self.lastLocation.speed < 0 || location.speed - self.lastLocation.speed <= -self.speedDeltaThreshold || location.speed - self.lastLocation.speed >= self.speedDeltaThreshold)) ||
-            (location.course >= 0 && (self.lastLocation.course < 0 || location.course - self.lastLocation.course <= -self.courseDeltaThreshold || location.course - self.lastLocation.course >= self.courseDeltaThreshold)) ||
+            (location.speed >= 0 && (self.lastLocation.speed < 0 || ABS(location.speed - self.lastLocation.speed) >= self.speedDeltaThreshold)) ||
+            (location.course >= 0 && location.speed >= self.speedDeltaThreshold && (self.lastLocation.course < 0 || ABS(location.course - self.lastLocation.course) >= self.courseDeltaThreshold)) ||
             [location.timestamp timeIntervalSinceDate:self.lastLocation.timestamp] >= self.period ||
             (self.distanceThreshold > 0 && [location distanceFromLocation:self.lastLocation] >= self.distanceThreshold)
             ) {
