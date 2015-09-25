@@ -41,8 +41,9 @@
         self.locationManager = [[CLLocationManager alloc] init];
         self.locationManager.delegate = self;
         
-        self.locationManager.pausesLocationUpdatesAutomatically = NO;
+        self.locationManager.pausesLocationUpdatesAutomatically = YES;
         self.locationManager.desiredAccuracy = kCLLocationAccuracyBestForNavigation;
+        self.locationManager.activityType = CLActivityTypeAutomotiveNavigation;
         
         NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
         self.deviceId = [userDefaults stringForKey:@"device_id_preference"];
@@ -61,10 +62,12 @@
     if ([self.locationManager respondsToSelector:@selector(requestAlwaysAuthorization)]) {
         [self.locationManager requestAlwaysAuthorization];
     }
+    [self.locationManager startMonitoringSignificantLocationChanges];
     [self.locationManager startUpdatingLocation];
 }
 
 - (void)stopUpdates {
+    [self.locationManager stopMonitoringSignificantLocationChanges];
     [self.locationManager stopUpdatingLocation];
 }
 
