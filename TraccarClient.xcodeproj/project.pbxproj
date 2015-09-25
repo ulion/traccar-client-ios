@@ -66,6 +66,7 @@
 /* Begin PBXFileReference section */
 		823899981BA787FD00681873 /* KSURLQueryUtilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = KSURLQueryUtilities.h; path = KSFileUtilities/KSURLQueryUtilities.h; sourceTree = "<group>"; };
 		823899991BA787FD00681873 /* KSURLQueryUtilities.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = KSURLQueryUtilities.m; path = KSFileUtilities/KSURLQueryUtilities.m; sourceTree = "<group>"; };
+		82EC25001BB5580000108F59 /* TraccarClient 2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "TraccarClient 2.xcdatamodel"; sourceTree = "<group>"; };
 		CBB504DE1B8C1FC5001C1F8B /* TCDatabaseHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TCDatabaseHelper.h; sourceTree = "<group>"; };
 		CBB504DF1B8C1FC5001C1F8B /* TCDatabaseHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TCDatabaseHelper.m; sourceTree = "<group>"; };
 		CBCE82EE1B8D253600A7318B /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
@@ -782,9 +783,10 @@
 		CBCE82F01B8D265800A7318B /* TraccarClient.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
+				82EC25001BB5580000108F59 /* TraccarClient 2.xcdatamodel */,
 				CBCE82F11B8D265800A7318B /* TraccarClient.xcdatamodel */,
 			);
-			currentVersion = CBCE82F11B8D265800A7318B /* TraccarClient.xcdatamodel */;
+			currentVersion = 82EC25001BB5580000108F59 /* TraccarClient 2.xcdatamodel */;
 			path = TraccarClient.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;
