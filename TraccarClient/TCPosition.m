@@ -44,9 +44,10 @@
     if (location.speed >= 0) {
         self.speed = location.speed * 1.94384; // knots from m/s
     }
-    if (location.course >= 0) {
-        self.course = location.course;
+    else {
+        self.speed = -1;
     }
+    self.course = location.course;
 }
 
 @end
