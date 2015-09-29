@@ -25,7 +25,7 @@
                               path:@"/"
                    queryParameters:[NSDictionary dictionaryWithObjectsAndKeys:
                                     position.deviceId, @"id",
-                                    [NSString stringWithFormat:@"%ld", (long) [position.time timeIntervalSince1970]], @"timestamp",
+                                    [NSString stringWithFormat:@"%lld", (long long) (1000 * [position.time timeIntervalSince1970])], @"timestamp",
                                     [NSString stringWithFormat:@"%f", position.latitude], @"lat",
                                     [NSString stringWithFormat:@"%f", position.longitude], @"lon",
                                     [NSString stringWithFormat:@"%g", position.horizontalAccuracy], @"hacc",
