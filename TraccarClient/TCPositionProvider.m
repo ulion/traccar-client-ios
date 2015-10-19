@@ -41,6 +41,14 @@
         self.locationManager = [[CLLocationManager alloc] init];
         self.locationManager.delegate = self;
         
+        // Check for iOS 8. Without this guard the code will crash with "unknown selector" on iOS 7.
+        if ([self.locationManager respondsToSelector:@selector(requestAlwaysAuthorization)]) {
+            [self.locationManager requestAlwaysAuthorization];
+        }
+        
+        CLAuthorizationStatus status = [CLLocationManager authorizationStatus];
+        NSLog(@"Location manager auth status: %d", status);
+        
         self.locationManager.pausesLocationUpdatesAutomatically = YES;
         self.locationManager.desiredAccuracy = kCLLocationAccuracyBestForNavigation;
         self.locationManager.activityType = CLActivityTypeAutomotiveNavigation;
@@ -84,8 +92,8 @@
             continue;
         if (!self.lastLocation ||
             location.horizontalAccuracy < self.lastLocation.horizontalAccuracy ||
-            (location.speed >= 0 && (self.lastLocation.speed < 0 || ABS(location.speed - self.lastLocation.speed) >= self.speedDeltaThreshold)) ||
-            (location.course >= 0 && location.speed >= self.speedDeltaThreshold && (self.lastLocation.course < 0 || ABS(location.course - self.lastLocation.course) >= self.courseDeltaThreshold)) ||
+            (location.speed >= 0 && (self.lastLocation.speed < 0 || (self.speedDeltaThreshold > 0 && ABS(location.speed - self.lastLocation.speed) >= self.speedDeltaThreshold))) ||
+            (location.course >= 0 && location.speed >= self.speedDeltaThreshold && (self.lastLocation.course < 0 || (self.courseDeltaThreshold > 0 && ABS(location.course - self.lastLocation.course) >= self.courseDeltaThreshold))) ||
             [location.timestamp timeIntervalSinceDate:self.lastLocation.timestamp] >= self.period ||
             (self.distanceThreshold > 0 && [location distanceFromLocation:self.lastLocation] >= self.distanceThreshold)
             ) {
