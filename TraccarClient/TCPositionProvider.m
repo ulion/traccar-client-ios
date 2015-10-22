@@ -46,6 +46,17 @@
             [self.locationManager requestAlwaysAuthorization];
         }
         
+        // IOS 9 property to allow suspended app get location notification.
+        if ([self.locationManager respondsToSelector:@selector(allowsBackgroundLocationUpdates)]) {
+            BOOL yes = YES;
+            NSMethodSignature* signature = [[CLLocationManager class] instanceMethodSignatureForSelector: @selector( setAllowsBackgroundLocationUpdates: )];
+            NSInvocation* invocation = [NSInvocation invocationWithMethodSignature: signature];
+            [invocation setTarget: self.locationManager];
+            [invocation setSelector: @selector( setAllowsBackgroundLocationUpdates: ) ];
+            [invocation setArgument: &yes atIndex: 2];
+            [invocation invoke];
+        }
+        
         CLAuthorizationStatus status = [CLLocationManager authorizationStatus];
         NSLog(@"Location manager auth status: %d", status);
         

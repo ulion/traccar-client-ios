@@ -40,6 +40,8 @@
 
 - (TCPosition *)selectPosition {
     NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] initWithEntityName:@"Position"];
+    fetchRequest.sortDescriptors = @[[[NSSortDescriptor alloc] initWithKey:@"time" ascending:NO]];
+    fetchRequest.fetchLimit = 1;
     NSArray *fetchedObjects = [self.managedObjectContext executeFetchRequest:fetchRequest error:nil];
     if (fetchedObjects && fetchedObjects.count) {
         return [fetchedObjects objectAtIndex:0];
