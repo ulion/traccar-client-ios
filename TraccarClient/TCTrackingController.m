@@ -36,11 +36,14 @@ int64_t kRetryDelay = 30 * 1000;
 
 @property (nonatomic, strong) NSString *address;
 @property (nonatomic, assign) long port;
+@property (nonatomic, assign) long batchReportNum;
+@property (nonatomic, assign) long reportInterval;
+@property (nonatomic, strong) NSDate *lastSuccessReport;
 
 - (void)write:(TCPosition *)position;
 - (void)read;
-- (void)delete:(TCPosition *)position;
-- (void)send:(TCPosition *)position;
+- (void)delete:(NSArray *)position;
+- (void)send:(NSArray *)position;
 - (void)retry;
 
 @end
@@ -62,6 +65,10 @@ int64_t kRetryDelay = 30 * 1000;
         NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
         self.address = [userDefaults stringForKey:@"server_address_preference"];
         self.port = [userDefaults integerForKey:@"server_port_preference"];
+        self.batchReportNum = [userDefaults integerForKey:@"batch_report_num_preference"];
+        if (self.batchReportNum < 1)
+            self.batchReportNum = 1;
+        self.reportInterval = [userDefaults integerForKey:@"report_interval_preference"];
     }
     return self;
 }
@@ -104,30 +111,48 @@ int64_t kRetryDelay = 30 * 1000;
 
 - (void)write:(TCPosition *)position {
     if (self.online && self.waiting) {
-        [self read];
         self.waiting = NO;
+        [self read];
     }
 }
 
-- (void)read {
-    TCPosition *position = [self.databaseHelper selectPosition];
-    if (position) {
-        [self send:position];
+- (void)doRead {
+    NSArray *positions = [self.databaseHelper selectPositions:self.batchReportNum];
+    if (positions) {
+        [self send:positions];
     } else {
         self.waiting = YES;
     }
 }
 
-- (void)delete:(TCPosition *)position {
-    [self.databaseHelper deletePosition:position];
+- (void)read {
+    if (self.lastSuccessReport != nil) {
+        NSTimeInterval intervalLeft = -self.lastSuccessReport.timeIntervalSinceNow - self.reportInterval;
+        if (intervalLeft > 0) {
+            // we need wait a little while
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, intervalLeft * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+                if (!self.stopped && self.online) {
+                    [self doRead];
+                }
+            });
+            return;
+        }
+    }
+    [self doRead];
+}
+
+- (void)delete:(NSArray *)positions {
+    [self.databaseHelper deletePositions:positions];
     [self read];
 }
 
-- (void)send:(TCPosition *)position {
-    NSURL *request = [TCProtocolFormatter formatPostion:position address:self.address port:self.port];
+- (void)send:(NSArray *)positions {
+    NSURLRequest *request = [TCProtocolFormatter formatPostions:positions address:self.address port:self.port];
+    NSDate *sendTime = [NSDate date];
     [TCRequestManager sendRequest:request completionHandler:^(BOOL success) {
         if (success) {
-            [self delete:position];
+            self.lastSuccessReport = sendTime;
+            [self delete:positions];
         } else {
             [TCStatusViewController addMessage:NSLocalizedString(@"Send failed", @"")];
             [self retry];

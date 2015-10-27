@@ -27,5 +27,7 @@
 
 - (TCPosition *)selectPosition;
 - (void)deletePosition:(TCPosition *)position;
+- (NSArray *)selectPositions:(NSUInteger)fetchLimit;
+- (void)deletePositions:(NSArray *)positions;
 
 @end
