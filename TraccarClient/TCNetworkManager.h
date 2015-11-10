@@ -17,9 +17,15 @@
 #import <Foundation/Foundation.h>
 #import <SystemConfiguration/SystemConfiguration.h>
 
+typedef enum : NSInteger {
+    NotReachable = 0,
+    ReachableViaWiFi,
+    ReachableViaWWAN
+} NetworkStatus;
+
 @protocol TCNetworkManagerDelegate <NSObject>
 
-- (void)didUpdateNetwork:(BOOL)online;
+- (void)didUpdateNetwork:(NetworkStatus)status;
 
 @end
 
@@ -27,11 +33,11 @@
 
 @property (nonatomic, weak) id<TCNetworkManagerDelegate> delegate;
 
-@property (nonatomic, readonly) BOOL online;
+@property (nonatomic, readonly) NetworkStatus status;
 
 - (void)start;
 - (void)stop;
 
-+ (BOOL)onlineForFlags:(SCNetworkReachabilityFlags)flags;
++ (NetworkStatus)onlineForFlags:(SCNetworkReachabilityFlags)flags;
 
 @end

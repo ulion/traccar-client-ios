@@ -24,6 +24,8 @@
 @property (nonatomic, strong) CLLocation *lastLocation;
 @property (nonatomic, readonly) double batteryLevel;
 
+@property (nonatomic, assign) bool updatePaused;
+
 @property (nonatomic, strong) NSString *deviceId;
 @property (nonatomic, assign) long period;
 @property (nonatomic, assign) long minAccuracy;
@@ -63,6 +65,8 @@
         self.locationManager.pausesLocationUpdatesAutomatically = YES;
         self.locationManager.desiredAccuracy = kCLLocationAccuracyBestForNavigation;
         self.locationManager.activityType = CLActivityTypeAutomotiveNavigation;
+
+        self.updatePaused = NO;
         
         NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
         self.deviceId = [userDefaults stringForKey:@"device_id_preference"];
@@ -88,6 +92,7 @@
 - (void)stopUpdates {
     [self.locationManager stopMonitoringSignificantLocationChanges];
     [self.locationManager stopUpdatingLocation];
+    self.updatePaused = NO;
 }
 
 - (double)getBatteryLevel {
@@ -95,9 +100,29 @@
     return device.batteryLevel * 100;
 }
 
+- (void)locationManagerDidPauseLocationUpdates:(CLLocationManager *)manager {
+    NSLog(@"locationManagerDidPauseLocationUpdates");
+    [TCStatusViewController addMessage:NSLocalizedString(@"Location updates paused", @"")];
+    [self.locationManager stopMonitoringSignificantLocationChanges];
+    [self.locationManager startMonitoringSignificantLocationChanges];
+    self.updatePaused = YES;
+    // XXX: quit the app, so it will restart when detected significant location change?
+    //      currently after it's paused, it never get resumed even if it changes significantly.
+    // abort();
+}
+
+- (void)locationManagerDidResumeLocationUpdates:(CLLocationManager *)manager {
+    NSLog(@"locationManagerDidResumeLocationUpdates");
+    [TCStatusViewController addMessage:NSLocalizedString(@"Location updates resumed", @"")];
+    self.updatePaused = NO;
+}
+
 - (void)locationManager:(CLLocationManager *)manager
      didUpdateLocations:(NSArray *)locations {
-
+    if (self.updatePaused) {
+        [TCStatusViewController addMessage:NSLocalizedString(@"Paused but got a location update", @"")];
+        [self.locationManager startUpdatingLocation];
+    }
     for (CLLocation *location in locations) {
         if (location.horizontalAccuracy < 0 || (self.minAccuracy > 0 && location.horizontalAccuracy > self.minAccuracy) || (self.lastLocation && [location.timestamp isEqualToDate:self.lastLocation.timestamp]))
             continue;

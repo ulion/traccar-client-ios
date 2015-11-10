@@ -26,7 +26,7 @@ int64_t kRetryDelay = 30 * 1000;
 
 @interface TCTrackingController () <TCPositionProviderDelegate, TCNetworkManagerDelegate>
 
-@property (nonatomic) BOOL online;
+@property (nonatomic) NetworkStatus netStatus;
 @property (nonatomic) BOOL waiting;
 @property (nonatomic) BOOL stopped;
 
@@ -39,6 +39,8 @@ int64_t kRetryDelay = 30 * 1000;
 @property (nonatomic, assign) long batchReportNum;
 @property (nonatomic, assign) long reportInterval;
 @property (nonatomic, strong) NSDate *lastSuccessReport;
+@property (nonatomic, copy) NSDate *lastestPositionTime;
+@property (nonatomic) BOOL saveTraffic;
 
 - (void)write:(TCPosition *)position;
 - (void)read;
@@ -60,7 +62,7 @@ int64_t kRetryDelay = 30 * 1000;
         self.positionProvider.delegate = self;
         self.networkManager.delegate = self;
         
-        self.online = self.networkManager.online;
+        self.netStatus = self.networkManager.status;
         
         NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
         self.address = [userDefaults stringForKey:@"server_address_preference"];
@@ -73,9 +75,13 @@ int64_t kRetryDelay = 30 * 1000;
     return self;
 }
 
+- (BOOL)saveTraffic {
+    return [[NSUserDefaults standardUserDefaults] boolForKey:@"save_traffic_preference"];
+}
+
 - (void)start {
     self.stopped = NO;
-    if (self.online) {
+    if (self.netStatus) {
         [self read];
     }
     [self.positionProvider startUpdates];
@@ -93,12 +99,21 @@ int64_t kRetryDelay = 30 * 1000;
     [self write:position];
 }
 
-- (void)didUpdateNetwork:(BOOL)online {
-    [TCStatusViewController addMessage:NSLocalizedString(@"Connectivity change", @"")];
-    if (!self.online && online) {
-        [self read];
+- (void)didUpdateNetwork:(NetworkStatus)status {
+    if (status) {
+        if (status == ReachableViaWiFi)
+            [TCStatusViewController addMessage:NSLocalizedString(@"Connectivity wifi", @"")];
+        else
+            [TCStatusViewController addMessage:NSLocalizedString(@"Connectivity 2g/3g", @"")];
     }
-    self.online = online;
+    else
+        [TCStatusViewController addMessage:NSLocalizedString(@"Connectivity offline", @"")];
+    if (self.netStatus != status) {
+        BOOL wasOnline = !!self.netStatus;
+        self.netStatus = status;
+        if (!wasOnline)
+            [self read];
+    }
 }
 
 //
@@ -110,15 +125,26 @@ int64_t kRetryDelay = 30 * 1000;
 //
 
 - (void)write:(TCPosition *)position {
-    if (self.online && self.waiting) {
+    if (self.netStatus && self.waiting) {
         self.waiting = NO;
         [self read];
     }
 }
 
 - (void)doRead {
-    NSArray *positions = [self.databaseHelper selectPositions:self.batchReportNum];
+    BOOL saveTraffic = self.netStatus != ReachableViaWiFi && self.saveTraffic;
+    long batchNum = saveTraffic ? 1 : self.batchReportNum;
+    // XXX: save traffic mode only send newer position info
+    NSArray *positions = [self.databaseHelper selectPositions:batchNum];
     if (positions) {
+        if (saveTraffic && self.lastestPositionTime != nil) {
+            TCPosition *position = (TCPosition *)[positions objectAtIndex:0];
+            if ([position.time compare:self.lastestPositionTime] != NSOrderedDescending) {
+                // the position is not newer then what we finally sent.
+                self.waiting = YES;
+                return;
+            }
+        }
         [self send:positions];
     } else {
         self.waiting = YES;
@@ -126,22 +152,30 @@ int64_t kRetryDelay = 30 * 1000;
 }
 
 - (void)read {
-    if (self.lastSuccessReport != nil) {
-        NSTimeInterval intervalLeft = -self.lastSuccessReport.timeIntervalSinceNow - self.reportInterval;
+    // if the connection is wifi, we don't need wait.
+    if (self.netStatus != ReachableViaWiFi && self.lastSuccessReport != nil) {
+        NSTimeInterval intervalLeft = self.reportInterval+self.lastSuccessReport.timeIntervalSinceNow;
         if (intervalLeft > 0) {
             // we need wait a little while
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, intervalLeft * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
-                if (!self.stopped && self.online) {
+                if (self.netStatus) {
                     [self doRead];
                 }
             });
             return;
         }
     }
-    [self doRead];
+    if (self.netStatus) {
+        [self doRead];
+    }
 }
 
 - (void)delete:(NSArray *)positions {
+    TCPosition *position = (TCPosition *)[positions objectAtIndex:0];
+    if (self.lastestPositionTime == nil || [position.time compare:self.lastestPositionTime] == NSOrderedDescending) {
+        // save reported newest position time
+        self.lastestPositionTime = position.time;
+    }
     [self.databaseHelper deletePositions:positions];
     [self read];
 }
@@ -152,6 +186,7 @@ int64_t kRetryDelay = 30 * 1000;
     [TCRequestManager sendRequest:request completionHandler:^(BOOL success) {
         if (success) {
             self.lastSuccessReport = sendTime;
+            [TCStatusViewController addMessage:NSLocalizedString(@"Location sent", @"")];
             [self delete:positions];
         } else {
             [TCStatusViewController addMessage:NSLocalizedString(@"Send failed", @"")];
@@ -162,7 +197,7 @@ int64_t kRetryDelay = 30 * 1000;
 
 - (void)retry {
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, kRetryDelay * NSEC_PER_MSEC), dispatch_get_main_queue(), ^{
-        if (!self.stopped && self.online) {
+        if (self.netStatus) {
             [self read];
         }
     });

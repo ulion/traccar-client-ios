@@ -43,7 +43,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     return self;
 }
 
-- (BOOL)online {
+- (NetworkStatus)status {
     SCNetworkReachabilityFlags flags;
     SCNetworkReachabilityGetFlags(self.reachability, &flags);
     return [TCNetworkManager onlineForFlags:flags];
@@ -63,26 +63,29 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     }
 }
 
-+ (BOOL)onlineForFlags:(SCNetworkReachabilityFlags)flags {
++ (NetworkStatus)onlineForFlags:(SCNetworkReachabilityFlags)flags {
     if ((flags & kSCNetworkReachabilityFlagsReachable) == 0) {
-        return NO;
+        return NotReachable;
     }
     
+    if ((flags & kSCNetworkReachabilityFlagsIsWWAN) == kSCNetworkReachabilityFlagsIsWWAN) {
+        // non-wifi
+        return ReachableViaWWAN;
+    }
+
     if ((flags & kSCNetworkReachabilityFlagsConnectionRequired) == 0) {
-        return YES;
+        // possible wifi
+        return ReachableViaWiFi;
     }
     
     if ((flags & kSCNetworkReachabilityFlagsConnectionOnDemand) != 0 || (flags & kSCNetworkReachabilityFlagsConnectionOnTraffic) != 0) {
         if ((flags & kSCNetworkReachabilityFlagsInterventionRequired) == 0) {
-            return YES;
+            // possible wifi
+            return ReachableViaWiFi;
         }
     }
     
-    if ((flags & kSCNetworkReachabilityFlagsIsWWAN) != 0) {
-        return YES;
-    }
-    
-    return NO;
+    return NotReachable;
 }
 
 @end
